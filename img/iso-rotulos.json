@@ -1,0 +1,96 @@
+{
+ "ico-excel": {
+  "_tam": [
+   180,
+   138
+  ]
+ },
+ "ico-iban": {
+  "_tam": [
+   180,
+   130
+  ]
+ },
+ "ico-recibos": {
+  "_tam": [
+   180,
+   135
+  ]
+ },
+ "ico-remesa": {
+  "_tam": [
+   180,
+   138
+  ]
+ },
+ "ico-banco": {
+  "_tam": [
+   191,
+   178
+  ]
+ },
+ "ico-mapa": {
+  "_tam": [
+   180,
+   130
+  ]
+ },
+ "iso-catastro": {
+  "Más agua": [
+   81.67,
+   35.33
+  ],
+  "Parcela 271 · 4.180 m³": [
+   59.74,
+   25.59
+  ],
+  "Sin contador": [
+   40.26,
+   49.86
+  ],
+  "_tam": [
+   657,
+   401
+  ]
+ },
+ "iso-datos": {
+  "Copia de cada día": [
+   71.15,
+   51.27
+  ],
+  "Pendrive": [
+   61.24,
+   61.39
+  ],
+  "Carpeta en la nube": [
+   51.33,
+   71.52
+  ],
+  "Tu ordenador": [
+   17.65,
+   31.65
+  ],
+  "_tam": [
+   646,
+   316
+  ]
+ },
+ "iso-roles": {
+  "Administrador": [
+   34.76,
+   25.66
+  ],
+  "Gestor": [
+   50,
+   43.42
+  ],
+  "Solo consulta": [
+   65.24,
+   60.53
+  ],
+  "_tam": [
+   420,
+   304
+  ]
+ }
+}

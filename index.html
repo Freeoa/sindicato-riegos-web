@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sindicato de Riegos</title>
+<meta name="description" content="Regantes, canon, recibos y remesas en un solo programa, conectado al Catastro: mira en el mapa de quién es cada parcela y cuánta agua ha consumido.">
+<meta name="theme-color" content="#F1ECE2">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="img/gota.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/HankenGrotesk-800.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="fonts/HankenGrotesk-400.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="styles.css">
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+
+<header class="barra" id="inicio">
+  <a class="marca" href="#inicio" aria-label="Sindicato de Riegos, inicio">
+    <svg class="gota" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c3.6 4.4 6.4 7.6 6.4 11.2a6.4 6.4 0 0 1-12.8 0C5.6 9.8 8.4 6.6 12 2.2Z"/></svg>
+    <span>Sindicato de Riegos</span>
+  </a>
+  <nav class="enlaces" id="menu" aria-label="Principal">
+    <a href="#catastro">Catastro</a>
+    <a href="#que-hace">Qué hace</a>
+    <a href="#como">Cómo funciona</a>
+    <a href="#datos">Tus datos</a>
+  </nav>
+  <a class="boton oscuro chico" href="#contacto">Pedir demostración</a>
+  <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu">Menú</button>
+</header>
+
+<main>
+
+<section class="hero" aria-labelledby="titulo">
+  <div class="hero-fondo" aria-hidden="true">
+    <video autoplay muted loop playsinline preload="auto" poster="img/campo-poster.webp" width="1600" height="900" tabindex="-1">
+      <source src="img/campo.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="marco">
+    <h1 id="titulo">Del Excel al banco, sin perder recibos</h1>
+    <div class="hero-fila">
+      <div class="hero-izq">
+        <p class="entradilla">El programa que lleva regantes, canon, recibos y remesas de tu sindicato de riegos, todo en un sitio y en tu propio ordenador.</p>
+        <div class="acciones">
+          <a class="boton oscuro" href="#contacto">Pedir una demostración</a>
+          <a class="boton arena" href="#como">Ver cómo funciona</a>
+        </div>
+        <div class="notas">
+          <a class="nota destaca" href="#catastro">Conectado al Catastro: ve en el mapa de quién es cada parcela y cuánta agua ha gastado <span aria-hidden="true">→</span></a>
+          <a class="nota" href="#datos">Funciona sin Internet y tus datos no salen de tu ordenador <span aria-hidden="true">→</span></a>
+        </div>
+        <img class="mascota m-garza" src="img/tinta/garza-senalando.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" onerror="this.remove()">
+      </div>
+      <div class="calc mapita" id="mapita" role="group" aria-labelledby="t-calc">
+        <img class="mascota m-calc" src="img/tinta/nutria-senalando-abajo.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" onerror="this.remove()">
+        <h2 id="t-calc">Toca una parcela y mira de quién es</h2>
+        <div class="mapa-barra">
+          <div class="ejemplos" role="group" aria-label="Qué colorear en el mapa">
+            <button type="button" class="chip" data-modo="quien" aria-pressed="true">De quién es</button>
+            <button type="button" class="chip" data-modo="agua" aria-pressed="false">Agua gastada</button>
+          </div>
+          <div class="mapa-busca" role="search"><input type="search" id="mapa-q" inputmode="numeric" placeholder="Nº de parcela" aria-label="Buscar una parcela por su número"><button type="button" id="mapa-ir" class="chip">Buscar</button></div>
+        </div>
+        <div class="ficha-parcela" aria-live="polite">
+          <p class="quien"><i class="dot" id="mp-dot"></i><strong id="mp-n">…</strong></p>
+          <p class="donde" id="mp-p">…</p>
+          <p class="agua"><strong id="mp-m">0</strong><span id="mp-u"> m³ este año</span></p>
+          <div class="barra-m" aria-hidden="true"><i id="mp-b"></i></div>
+        </div>
+        <div class="mapa-demo" id="mapa-demo" role="region" aria-label="Mapa de parcelas de ejemplo sobre la foto aérea: pulsa una parcela para ver su regante y su consumo"></div>
+        <div class="leyenda-mapa" id="mapa-leyenda"></div>
+        <p class="aviso" id="mapa-aviso" aria-live="polite"></p>
+        <p class="aviso">Contornos reales del Catastro público de Mallén; regantes, contadores y consumos inventados. En el programa es este mismo mapa, con tus parcelas.</p>
+      </div>
+    </div>
+  </div>
+  <div class="marco ancho">
+    <div class="escenario">
+      <div class="ventana">
+        <div class="ventana-barra" aria-hidden="true"><i></i><i></i><i></i><b>Recibos del semestre</b></div>
+        <video class="clip" autoplay muted loop playsinline preload="metadata" poster="img/recibos-poster.webp" width="1280" height="800" aria-label="Grabación del programa: se desmarcan varios regantes de «Recibos del semestre» y cambia el total de la remesa">
+          <source src="img/recibos.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="juntos" id="juntos" aria-labelledby="t-juntos">
+  <img class="mascota pasea" src="img/tinta/garza-caminando.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" onerror="this.remove()">
+  <div class="marco">
+    <h2 id="t-juntos" class="rv">Todo el canon corre por un solo canal</h2>
+    <div class="cuadricula">
+      <div class="juntos-texto">
+        <p class="frase rv" style="--d:80ms">Hoy el consumo vive en un Excel, los IBAN en una libreta y el banco pide un fichero que nadie recuerda hacer. Aquí todo confluye.</p>
+        <ul class="leyenda rv" style="--d:140ms">
+          <li><span class="punto p1"></span>Excel de consumo</li>
+          <li><span class="punto p2"></span>Libreta de IBAN</li>
+          <li><span class="punto p3"></span>Hojas de recibos</li>
+          <li><span class="punto p4"></span>Fichero del banco</li>
+          <li><span class="punto p5"></span>Un solo programa</li>
+        </ul>
+      </div>
+      <figure class="campo rv" style="--d:120ms">
+        <img class="mascota m-juntos" src="img/tinta/nutria-senalando-derecha.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" onerror="this.remove()">
+        <img src="img/campo.svg" width="820" height="500" alt="Campo en isométrico: cuatro acequias, una por cada herramienta de hoy (Excel de consumo, libreta de IBAN, hojas de recibos y fichero del banco), desembocan en un único canal y en un solo depósito, el programa">
+        <span class="rotulo r1" style="left:49%;top:12.4%">Excel de consumo</span>
+        <span class="rotulo r2" style="left:60.7%;top:22%">Libreta de IBAN</span>
+        <span class="rotulo r3" style="left:72.4%;top:31.6%">Hojas de recibos</span>
+        <span class="rotulo r4" style="left:84.1%;top:41.2%">Fichero del banco</span>
+        <span class="rotulo r5" style="left:58.8%;top:71.2%">Un solo programa</span>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="mapa" id="catastro" aria-labelledby="t-mapa">
+  <div class="marco">
+    <div class="cab">
+      <div>
+        <h2 id="t-mapa" class="rv">Conectado al Catastro, parcela a parcela</h2>
+        <p class="frase rv" style="--d:80ms">Mira de quién es cada parcela y cuánta agua ha gastado, sobre el mapa. Cada parcela del sindicato se dibuja sobre la foto aérea con su contorno oficial. Pulsa una y ves el regante, su canon y los metros cúbicos consumidos.</p>
+      </div>
+      <figure class="campo iso rv" style="--d:120ms">
+        <img src="img/iso-catastro.svg" width="657" height="401" alt="Las parcelas del sindicato como columnas de colores, una por parcela: cuanto más alta, más agua ha gastado; una gris, sin contador">
+        <span class="rotulo c " style="left:81.67%;top:35.33%">Más agua</span>
+        <span class="rotulo c " style="left:59.74%;top:25.59%">Parcela 271 · 4.180 m³</span>
+        <span class="rotulo c " style="left:40.26%;top:49.86%">Sin contador</span>
+      </figure>
+    </div>
+    <div class="mapa-fila">
+      <div class="vistas rv" style="--d:120ms" role="group" aria-label="Qué colorear en el mapa">
+        <button type="button" class="vista" aria-pressed="true" data-v="0"><strong>De quién es</strong><span>Un color por regante: de un vistazo, qué parcelas lleva cada uno.</span></button>
+        <button type="button" class="vista" aria-pressed="false" data-v="1"><strong>Cuánto paga</strong><span>El canon del año, en cinco tramos de azul. Cuanto más oscuro, más paga.</span></button>
+        <button type="button" class="vista" aria-pressed="false" data-v="2"><strong>Cuánta agua ha gastado</strong><span>Los metros cúbicos leídos en el contador de cada parcela. En gris, las que no tienen contador.</span></button>
+        <p class="vistas-nota">Los contornos son los del Catastro público y se guardan en tu ordenador. La foto aérea se descarga cuando hay Internet.</p>
+      </div>
+      <figure class="ventana mapa-ventana rv" style="--d:200ms">
+        <div class="ventana-barra" aria-hidden="true"><i></i><i></i><i></i><b>Mapa catastral</b></div>
+        <div class="mapa-visor">
+          <img src="img/w20_mapa_regante.webp" width="1536" height="1884" alt="Mapa catastral con las parcelas de la huerta coloreadas por regante; una ventana muestra el regante, la referencia catastral, el canon del año y el agua consumida en metros cúbicos">
+          <img src="img/w21_mapa_canon.webp" width="1536" height="1756" alt="El mismo mapa con las parcelas coloreadas según el canon del año, en cinco tramos de azul">
+          <img src="img/w22_mapa_agua.webp" width="1536" height="1820" alt="El mismo mapa con las parcelas coloreadas según el agua consumida en metros cúbicos; las parcelas sin contador, en gris">
+        </div>
+      </figure>
+    </div>
+    <div class="ficha">
+      <div class="ventana rv"><div class="ventana-barra" aria-hidden="true"><i></i><i></i><i></i><b>Mapa catastral</b></div><img loading="lazy" src="img/w24_parcela_catastro.webp" width="2288" height="1884" alt="Búsqueda de una referencia catastral: el mapa señala la parcela y el panel dice a qué regante está asignada"></div>
+      <div class="ficha-texto">
+        <h3 class="rv">Escribe una referencia y aparece la parcela</h3>
+        <p class="rv" style="--d:80ms">El programa la localiza en el Catastro, la señala en el mapa y te dice a qué regante está asignada. Parcelario público de Aragón y Navarra, guardado en tu ordenador.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="como" id="como" aria-labelledby="t-como">
+  <div class="marco">
+    <h2 id="t-como" class="rv">De la hoja al banco, en cinco pasos</h2>
+    <div class="pasos">
+      <ol class="lista-pasos">
+        <li class="paso" data-i="0">
+          <img class="ico" src="img/ico-excel.svg" alt="" aria-hidden="true" width="180" height="138" loading="lazy">
+          <h3>Cargas tu Excel</h3>
+          <p>El programa lee la hoja de consumo y la de deudores, y te enseña un resumen antes de guardar nada. Antes de aplicarlo hace una copia de seguridad.</p>
+          <img class="en-linea" loading="lazy" src="img/w03_excel_resumen.webp" width="2000" height="1250" alt="Resumen de la carga del Excel: regantes con uso e IBAN, con uso y sin IBAN, con IBAN y sin uso, y el canon del año">
+        </li>
+        <li class="paso" data-i="1">
+          <img class="ico" src="img/ico-iban.svg" alt="" aria-hidden="true" width="180" height="138" loading="lazy">
+          <h3>Ves quién no tiene IBAN</h3>
+          <p>Los regantes sin cuenta quedan a la vista para pedírsela. Se escribe en su ficha y, si algún dígito falla, el programa avisa antes de guardar.</p>
+          <img class="en-linea" loading="lazy" src="img/w10_sin_iban.webp" width="2000" height="1250" alt="Lista de regantes filtrada por «Solo sin IBAN»">
+        </li>
+        <li class="paso" data-i="2">
+          <img class="ico" src="img/ico-recibos.svg" alt="" aria-hidden="true" width="180" height="138" loading="lazy">
+          <h3>Emites los recibos del semestre</h3>
+          <p>El importe sale del consumo, al céntimo. Marcas a quién se cobra y a quién no: quien ya ha pagado en mano se queda fuera.</p>
+          <img class="en-linea" loading="lazy" src="img/w01_recibos.webp" width="2000" height="1250" alt="Recibos del semestre con casillas para marcar a quién se cobra">
+        </li>
+        <li class="paso" data-i="3">
+          <img class="ico" src="img/ico-remesa.svg" alt="" aria-hidden="true" width="180" height="138" loading="lazy">
+          <h3>Creas la remesa</h3>
+          <p>Eliges la fecha de cobro y el programa prepara el fichero de adeudos SEPA para la banca electrónica. Hasta que lo subes, todo se puede cambiar.</p>
+          <img class="en-linea" loading="lazy" src="img/w04_remesa_panel.webp" width="2000" height="1250" alt="Panel para crear la remesa: fecha de cobro y nombre">
+        </li>
+        <li class="paso" data-i="4">
+          <img class="ico" src="img/ico-banco.svg" alt="" aria-hidden="true" width="180" height="138" loading="lazy">
+          <h3>La subes y la marcas como cobrada</h3>
+          <p>Cuando el banco cobra, la remesa pasa a cobrada. Si devuelve un recibo, lo apuntas y vuelve a quedar como deuda.</p>
+          <img class="en-linea" loading="lazy" src="img/w07_remesa_enviada.webp" width="1500" height="1580" alt="Detalle de una remesa enviada al banco, con el botón «Marcar como cobrada»">
+        </li>
+      </ol>
+      <div class="visor" aria-hidden="true">
+        <img class="mascota m-como" src="img/tinta/nutria-asomando.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" onerror="this.remove()">
+        <div class="visor-marco">
+          <img class="on" src="img/w03_excel_resumen.webp" width="2000" height="1250" alt="">
+          <img src="img/w10_sin_iban.webp" width="2000" height="1250" alt="" loading="lazy">
+          <img src="img/w01_recibos.webp" width="2000" height="1250" alt="" loading="lazy">
+          <img src="img/w04_remesa_panel.webp" width="2000" height="1250" alt="" loading="lazy">
+          <img src="img/w07_remesa_enviada.webp" width="1500" height="1580" alt="" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="que-hace" id="que-hace" aria-labelledby="t-hace">
+  <div class="marco">
+    <div class="cab">
+      <div>
+        <h2 id="t-hace" class="rv">Todo el sindicato, en un solo menú</h2>
+        <p class="frase rv" style="--d:80ms">Lo que empieza con los recibos del canon sigue con el agua, la contabilidad, las juntas y el mapa.</p>
+      </div>
+      <figure class="campo iso rv" style="--d:120ms">
+        <img src="img/tinta/parcela-regadio.webp" width="836" height="643" alt="Dibujo a tinta de una parcela de regadío cortada como una maqueta: acequia con compuerta y puente, surcos, frutales y una caseta de riego" loading="lazy">
+      </figure>
+    </div>
+    <ul class="chips" aria-label="Pantallas del programa">
+      <li>Regantes</li><li>Hoja de canon</li><li>Recibos del semestre</li><li>Remesas SEPA</li><li>Cobros</li><li>Precios del canon</li>
+      <li>Campañas</li><li>Derramas</li><li>Facturación</li><li>Contabilidad</li><li>Proveedores</li><li>Turnos de riego</li>
+      <li>Contadores</li><li>Albaranes</li><li>Tarifas de agua</li><li>Consumo</li><li>Actas y votaciones</li><li>Informes</li>
+      <li>Transmisiones</li><li>Incidencias</li><li>Certificados</li><li>Mapa catastral</li><li>Portal del regante</li><li>Importar y exportar</li>
+      <li>Revisión de IBAN</li><li>Emparejar regantes</li><li>Usuarios y permisos</li><li>Auditoría</li><li>Copias de seguridad</li>
+    </ul>
+  </div>
+</section>
+
+<section class="bloque a" aria-labelledby="t-a">
+  <div class="marco">
+    <img class="tinta t-garza" src="img/tinta/garza-contable.webp" width="633" height="870" alt="" aria-hidden="true" loading="lazy" decoding="async">
+    <div class="bloque-texto">
+      <h3 id="t-a" class="rv">Cada regante, con su canon a la vista</h3>
+      <p class="rv" style="--d:80ms">La hoja de canon reúne en una pantalla las unidades, el canon, lo que se paga cada semestre y lo cobrado. Se filtra por quien no tiene IBAN o no tiene mandato, y se descarga en Excel.</p>
+    </div>
+    <div class="ventana rv" style="--d:120ms">
+      <div class="ventana-barra" aria-hidden="true"><i></i><i></i><i></i><b>Hoja de canon</b></div>
+      <img loading="lazy" src="img/w02_hoja_canon.webp" width="2000" height="1250" alt="Hoja de canon: una fila por regante con caíces, hanegadas, almudes, canon y los dos semestres">
+    </div>
+  </div>
+</section>
+
+<section class="bloque b" aria-labelledby="t-b">
+  <div class="marco cuadricula">
+    <img class="mascota m-corregir" src="img/tinta/nutria-regante.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" onerror="this.remove()">
+    <div class="bloque-texto">
+      <h3 id="t-b" class="rv">Corregir un importe lleva medio minuto</h3>
+      <p class="rv" style="--d:80ms">Cambias el consumo o lo que paga un regante en un semestre y el recibo pendiente se actualiza solo. Pide siempre un motivo y queda anotado. Lo cobrado, o lo que ya va en una remesa, no se toca.</p>
+    </div>
+    <div class="dos">
+      <div class="ventana rv" style="--d:100ms"><img loading="lazy" src="img/w17_corregir.webp" width="1500" height="1195" alt="Formulario para corregir el consumo y el importe de cada semestre de un regante, con el motivo obligatorio"></div>
+      <div class="ventana rv" style="--d:200ms"><img loading="lazy" src="img/w18_recibos_ficha.webp" width="1500" height="1195" alt="Ficha de un regante con sus recibos: el pendiente se puede editar, el que va en una remesa aparece como no editable"></div>
+    </div>
+  </div>
+</section>
+
+<section class="bloque c" aria-labelledby="t-c">
+  <div class="marco cuadricula">
+    <div class="ventana rv">
+      <div class="ventana-barra" aria-hidden="true"><i></i><i></i><i></i><b>Informes</b></div>
+      <img loading="lazy" src="img/w09_informes.webp" width="2000" height="1250" alt="Informe de morosos: quién debe, cuánto y desde cuándo">
+    </div>
+    <div class="bloque-texto">
+      <h3 id="t-c" class="rv">Quién debe qué, sin buscar</h3>
+      <p class="rv" style="--d:80ms">Morosos con su antigüedad, padrón de regantes, resumen de campaña y superficie, para la junta o para reclamar. Todo se imprime o se lleva a Excel.</p>
+    </div>
+  </div>
+</section>
+
+<section class="roles" aria-labelledby="t-roles">
+  <div class="marco cuadricula">
+    <div class="roles-cab">
+      <h2 id="t-roles" class="rv">Cada persona ve lo que le toca</h2>
+      <figure class="campo iso rv" style="--d:100ms">
+        <img src="img/iso-roles.svg" width="420" height="304" alt="Tres columnas de distinta altura: el administrador lo puede todo, el gestor trabaja con los datos, y quien solo consulta mira sin cambiar nada">
+      </figure>
+    </div>
+    <dl class="roles-lista">
+      <div class="rv" style="--d:60ms"><dt>Administrador</dt><dd>Lo puede todo: usuarios, copias de seguridad, configuración y la carga del Excel.</dd></div>
+      <div class="rv" style="--d:140ms"><dt>Gestor</dt><dd>Trabaja con regantes, recibos, cobros, remesas, agua y contabilidad.</dd></div>
+      <div class="rv" style="--d:220ms"><dt>Solo consulta</dt><dd>Mira todo y no cambia nada.</dd></div>
+    </dl>
+  </div>
+  <div class="marco">
+    <p class="pie-roles rv">Los permisos se comprueban en el servidor, no solo en los botones. Cinco contraseñas erróneas bloquean al usuario diez minutos.</p>
+  </div>
+</section>
+
+<section class="datos" id="datos" aria-labelledby="t-datos">
+  <div class="marco">
+    <img class="mascota m-datos" src="img/tinta/buho-vigilante.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" onerror="this.remove()">
+    <div class="cab">
+      <div>
+        <h2 id="t-datos" class="rv">Tus datos se quedan en tu ordenador</h2>
+        <p class="frase rv" style="--d:80ms">Nada se sube a ningún servicio. Cada cambio se guarda en el propio equipo y se protege de tres maneras.</p>
+      </div>
+      <figure class="campo iso rv" style="--d:120ms">
+        <img src="img/iso-datos.svg" width="646" height="316" alt="Un ordenador dentro de un patio con muro y, fuera, tres copias de seguridad unidas por una acequia: la de cada día, un pendrive y una carpeta en la nube">
+        <span class="rotulo izq" style="left:17.65%;top:31.65%">Tu ordenador</span>
+        <span class="rotulo der" style="left:71.15%;top:51.27%">Copia de cada día</span>
+        <span class="rotulo der" style="left:61.24%;top:61.39%">Pendrive</span>
+        <span class="rotulo der" style="left:51.33%;top:71.52%">Carpeta en la nube</span>
+      </figure>
+    </div>
+    <div class="hechos">
+      <div class="hecho rv" style="--d:60ms"><h3>Copia cada día y al cerrar</h3><p>Y antes de cargar un Excel, unir fichas o actualizar el programa. También en un pendrive o en una carpeta de la nube.</p></div>
+      <div class="hecho rv" style="--d:140ms"><h3>Un corte de luz no pierde nada</h3><p>Cada cambio se anota antes de confirmarse y, al volver a abrir, se recupera solo.</p></div>
+      <div class="hecho rv" style="--d:220ms"><h3>Actualizar no borra datos</h3><p>Antes de instalar una versión nueva se guarda una copia verificada de la base. Si no puede, no instala.</p></div>
+    </div>
+    <div class="dos oscuras">
+      <div class="ventana rv"><div class="ventana-barra" aria-hidden="true"><i></i><i></i><i></i><b>Copias de seguridad</b></div><img loading="lazy" src="img/w13_copias.webp" width="2000" height="1250" alt="Pantalla de copias de seguridad: última copia, copia en otro sitio y lista de copias con sus botones"></div>
+      <div class="ventana rv" style="--d:120ms"><div class="ventana-barra" aria-hidden="true"><i></i><i></i><i></i><b>Auditoría</b></div><img loading="lazy" src="img/w12_auditoria.webp" width="2000" height="1250" alt="Auditoría: cada cambio con su fecha, usuario, dato y valor anterior y posterior"></div>
+    </div>
+  </div>
+</section>
+
+<section class="conecta" aria-labelledby="t-conecta">
+  <div class="marco">
+    <img class="tinta t-camion" src="img/tinta/camion-deposito.webp" width="938" height="616" alt="" aria-hidden="true" loading="lazy" decoding="async">
+    <h2 id="t-conecta" class="rv">Conecta con tu banco, Excel y Catastro</h2>
+    <div class="conexiones">
+      <div class="rv" style="--d:60ms"><img class="ico grande" src="img/ico-banco.svg" alt="" aria-hidden="true" width="180" height="138" loading="lazy"><h3>Banco</h3><p>Fichero SEPA de adeudos directos, en dos versiones, listo para subir a la banca electrónica. Comprueba cada IBAN antes de entregarlo.</p></div>
+      <div class="rv" style="--d:140ms"><img class="ico grande" src="img/ico-excel.svg" alt="" aria-hidden="true" width="180" height="138" loading="lazy"><h3>Excel</h3><p>Carga el consumo y los IBAN desde tu hoja y exporta recibos, padrón y morosos a Excel o CSV.</p></div>
+      <div class="rv" style="--d:220ms"><img class="ico grande" src="img/ico-mapa.svg" alt="" aria-hidden="true" width="180" height="138" loading="lazy"><h3>Catastro</h3><p>Parcelario público de Aragón y Navarra guardado en tu ordenador. Cada parcela se une a su regante y a su contador, y se ve en el mapa de quién es y cuánta agua ha gastado.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="contacto" id="contacto" aria-labelledby="t-contacto">
+  <div class="marco">
+    <img class="mascota m-saluda-garza" src="img/tinta/garza-saludando.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" onerror="this.remove()">
+    <img class="mascota m-saluda-gota" src="img/tinta/nutria-saludando.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" onerror="this.remove()">
+    <h2 id="t-contacto" class="rv">¿Lo vemos con tus datos?</h2>
+    <p class="frase rv" style="--d:80ms">Escríbenos y lo vemos juntos con una hoja de tu sindicato.</p>
+    <div class="acciones rv" style="--d:140ms">
+      <a class="boton claro" href="mailto:contacto@sindicato-riegos.example?subject=Quiero%20ver%20una%20demostraci%C3%B3n&amp;body=Hola%2C%20me%20gustar%C3%ADa%20ver%20el%20programa%20con%20los%20datos%20de%20nuestro%20sindicato.">Pedir una demostración</a>
+      <a class="boton arena" href="#inicio">Volver arriba</a>
+    </div>
+    <p class="correo rv" style="--d:200ms">Escribe a <strong>contacto@sindicato-riegos.example</strong></p>
+  </div>
+</section>
+
+</main>
+
+<footer class="pie">
+  <div class="marco">
+    <p class="firma" aria-hidden="true">Sindicato de Riegos</p>
+    <img class="mascota m-pie" src="img/tinta/nutria-durmiendo.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" onerror="this.remove()">
+    <div class="pie-fila">
+      <img class="tinta t-pivote" src="img/tinta/pivote-riego.webp" width="920" height="639" alt="" aria-hidden="true" loading="lazy" decoding="async">
+      <p>Todas las capturas de esta web usan datos inventados: los nombres, los IBAN, los contadores y los importes no corresponden a ninguna persona real. Solo son reales los contornos de las parcelas, que son públicos.</p>
+      <p>Vídeo del fondo: «20200728-NRCS-LSC-9001-Pivot Irrigation», USDAgov, dominio público, vía <a href="https://commons.wikimedia.org/wiki/File:20200728-NRCS-LSC-9001-Pivot_Irrigation.webm">Wikimedia Commons</a>. Tipografía Hanken Grotesk, con licencia SIL Open Font. Contornos de parcelas: Dirección General del Catastro, INSPIRE. Fotografía aérea: PNOA, © Instituto Geográfico Nacional (CC BY 4.0). Mapa interactivo: Leaflet.</p>
+    </div>
+  </div>
+</footer>
+
+
+<script src="vendor/leaflet/leaflet.js" defer></script>
+<script src="data/mapa-demo.js" defer></script>
+<script src="mapa.js" defer></script>
+<script src="app.js" defer></script>
+<script src="editor.js" defer></script>
+</body>
+</html>
