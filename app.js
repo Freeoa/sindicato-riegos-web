@@ -49,6 +49,25 @@
     }
   } else mascotas.forEach((n) => n.classList.add('visto'));
 
+  // Animales protagonistas: la burbuja va cambiando de frase y, al pulsarlos, saltan y dicen la siguiente
+  $$('.escena[data-frases]').forEach((esc) => {
+    const frases = esc.dataset.frases.split('|'), bur = $('.burbuja', esc), an = $('.animal', esc);
+    if (!bur || !an) return;
+    let i = 0, t = 0, visible = false;
+    const decir = (k) => {
+      i = ((k % frases.length) + frases.length) % frases.length;
+      bur.classList.add('cambia');
+      setTimeout(() => { bur.textContent = frases[i]; bur.classList.remove('cambia'); }, 220);
+    };
+    const kick = (clase) => { an.classList.remove(clase); void an.offsetWidth; an.classList.add(clase); setTimeout(() => an.classList.remove(clase), 900); };
+    const parar = () => { clearInterval(t); t = 0; };
+    const seguir = () => { if (!t && visible && !matchMedia('(prefers-reduced-motion: reduce)').matches && !('vistas' in esc.dataset)) t = setInterval(() => { if (!document.hidden) decir(i + 1); }, 5600); };
+    an.addEventListener('click', () => { decir(i + 1); kick('salta'); parar(); seguir(); });
+    if ('IntersectionObserver' in window) new IntersectionObserver((es) => es.forEach((e) => { visible = e.isIntersecting; visible ? seguir() : parar(); }), { threshold: .3 }).observe(esc);
+    // la garza del Catastro dice una frase por cada lectura del mapa
+    if ('vistas' in esc.dataset) $$('.vista').forEach((b, k) => b.addEventListener('click', () => { decir(k); kick('avisa'); }));
+  });
+
   // Mapa del Catastro: los tres botones cambian la lectura del mismo mapa
   const vistas = $$('.vista'), mapas = $$('.mapa-visor img');
   if (vistas.length) {

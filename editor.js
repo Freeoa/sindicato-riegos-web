@@ -28,7 +28,7 @@
   // ---- qué se puede editar -------------------------------------------------------------------------------------------
   const SEL_TEXTO = 'h1,h2,h3,p,li,dt,dd,.nota,.boton,.rotulo,.marca span,.enlaces a,.vista strong,.vista span,figcaption,.firma,.menu-btn';
   const SEL_DIBUJO = '.mascota:not(.pasea),.tinta,figure.iso,.ventana';
-  const EXCLUIR = '#mapita .mapa-barra,#mapita .mapa-demo,#mapita .leyenda-mapa,#mapita .ficha-parcela,#mapa-aviso,.leyenda';
+  const EXCLUIR = '#mapita .mapa-barra,#mapita .mapa-demo,#mapita .leyenda-mapa,#mapita .ficha-parcela,#mapa-aviso,.leyenda,.burbuja';
 
   function seccion(el) {
     const s = el.closest('header,main > section,footer');

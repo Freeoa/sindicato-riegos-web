@@ -52,10 +52,13 @@
           <a class="nota destaca" href="#catastro">Conectado al Catastro: ve en el mapa de quién es cada parcela y cuánta agua ha gastado <span aria-hidden="true">→</span></a>
           <a class="nota" href="#datos">Funciona sin Internet y tus datos no salen de tu ordenador <span aria-hidden="true">→</span></a>
         </div>
-        <img class="mascota m-garza" src="img/tinta/garza-senalando.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" onerror="this.remove()">
+        <div class="escena escena-hero rv" data-frases="¡Agua para todas las parcelas!|Pincha una parcela del mapa y te digo de quién es.|Los recibos salen solos. Yo solo abro la compuerta.">
+          <svg class="acequia" viewBox="0 0 600 70" preserveAspectRatio="none" aria-hidden="true"><path class="cauce" d="M0 38 C90 30 170 48 260 40 S430 30 600 40"/><path class="agua-corre" d="M0 38 C90 30 170 48 260 40 S430 30 600 40"/></svg>
+          <img class="animal" src="img/tinta/nutria-regante.webp" width="675" height="877" alt="" aria-hidden="true" decoding="async">
+          <p class="burbuja">¡Agua para todas las parcelas!</p>
+        </div>
       </div>
       <div class="calc mapita" id="mapita" role="group" aria-labelledby="t-calc">
-        <img class="mascota m-calc" src="img/tinta/nutria-senalando-abajo.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" onerror="this.remove()">
         <h2 id="t-calc">Toca una parcela y mira de quién es</h2>
         <div class="mapa-barra">
           <div class="ejemplos" role="group" aria-label="Qué colorear en el mapa">
@@ -137,6 +140,10 @@
         <button type="button" class="vista" aria-pressed="false" data-v="1"><strong>Cuánto paga</strong><span>El canon del año, en cinco tramos de azul. Cuanto más oscuro, más paga.</span></button>
         <button type="button" class="vista" aria-pressed="false" data-v="2"><strong>Cuánta agua ha gastado</strong><span>Los metros cúbicos leídos en el contador de cada parcela. En gris, las que no tienen contador.</span></button>
         <p class="vistas-nota">Los contornos son los del Catastro público y se guardan en tu ordenador. La foto aérea se descarga cuando hay Internet.</p>
+        <div class="escena escena-garza" data-frases="Cada color es un regante. Mira qué parcelas lleva cada uno.|El canon del año, en cinco tramos de azul. Cuanto más oscuro, más paga.|Cuánta agua ha pasado por cada contador. En gris, las que no tienen." data-vistas>
+          <img class="animal" src="img/tinta/garza-senalando.webp" width="619" height="878" alt="" aria-hidden="true" loading="lazy" decoding="async">
+          <p class="burbuja">Cada color es un regante. Mira qué parcelas lleva cada uno.</p>
+        </div>
       </div>
       <figure class="ventana mapa-ventana rv" style="--d:200ms">
         <div class="ventana-barra" aria-hidden="true"><i></i><i></i><i></i><b>Mapa catastral</b></div>
@@ -290,11 +297,14 @@
 
 <section class="datos" id="datos" aria-labelledby="t-datos">
   <div class="marco">
-    <img class="mascota m-datos" src="img/tinta/buho-vigilante.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" onerror="this.remove()">
     <div class="cab">
       <div>
         <h2 id="t-datos" class="rv">Tus datos se quedan en tu ordenador</h2>
         <p class="frase rv" style="--d:80ms">Nada se sube a ningún servicio. Cada cambio se guarda en el propio equipo y se protege de tres maneras.</p>
+        <div class="escena escena-buho rv" data-frases="Esta noche también he hecho la copia de cada día.|Una copia en un pendrive, por si falla el ordenador.|Y otra en una carpeta de la nube, a tu elección.">
+          <div class="animal-caja"><i class="farol" aria-hidden="true"></i><img class="animal" src="img/tinta/buho-vigilante.webp" width="772" height="882" alt="" aria-hidden="true" loading="lazy" decoding="async"></div>
+          <p class="burbuja">Esta noche también he hecho la copia de cada día.</p>
+        </div>
       </div>
       <figure class="campo iso rv" style="--d:120ms">
         <img src="img/iso-datos.svg" width="646" height="316" alt="Un ordenador dentro de un patio con muro y, fuera, tres copias de seguridad unidas por una acequia: la de cada día, un pendrive y una carpeta en la nube">
